@@ -1,15 +1,57 @@
 apiVersion: 1.0.0
-
 metadata:
-  name: didact-starter
-
+  name: didact-plus-java-mvn
 projects:
-  - name: sample-didact-project
+  - name: console-java-simple
     source:
-      location: 'https://github.com/bfitzpat/sample-didact-project'
+      location: 'https://github.com/che-samples/console-java-simple'
       type: git
-
+      branch: java1.11
 components:
   - id: redhat/vscode-didact/latest
     type: chePlugin
     registryUrl: 'https://eclipse-che.github.io/che-plugin-registry/main/v3/'
+    preferences:
+      didact.openDefaultTutorialAtStartup: true
+      che.welcome.enable: false
+      didact.defaultUrl: 'https://raw.githubusercontent.com/redhat-developer/vscode-didact/master/demos/markdown/simple-example.didact.md'
+  - id: redhat/java/latest
+    preferences:
+      java.server.launchMode: Standard
+    type: chePlugin
+    registryUrl: 'https://eclipse-che.github.io/che-plugin-registry/7.32.2/v3/'
+  - mountSources: true
+    endpoints:
+      - attributes:
+          public: 'false'
+        name: debug
+        port: 5005
+    memoryLimit: 512Mi
+    type: dockerimage
+    volumes:
+      - name: m2
+        containerPath: /home/user/.m2
+    image: 'quay.io/eclipse/che-java11-maven:7.32.2'
+    alias: maven
+    env:
+      - value: ''
+        name: MAVEN_CONFIG
+      - value: '-XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom -Duser.home=/home/user'
+        name: MAVEN_OPTS
+      - value: '-XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom'
+        name: JAVA_OPTS
+      - value: '-XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom'
+        name: JAVA_TOOL_OPTIONS
+commands:
+  - name: maven build
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/console-java-simple'
+        type: exec
+        command: mvn clean install
+        component: maven
+  - name: maven build and run
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/console-java-simple'
+        type: exec
+        command: mvn clean install && java -jar ./target/*.jar
+        component: maven
