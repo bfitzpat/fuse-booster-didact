@@ -14,7 +14,7 @@ components:
     preferences:
       didact.openDefaultTutorialAtStartup: true
       che.welcome.enable: false
-      didact.defaultUrl: 'https://raw.githubusercontent.com/redhat-developer/vscode-didact/master/demos/markdown/simple-example.didact.md'
+      didact.defaultUrl: 'https://raw.githubusercontent.com/bfitzpat/fuse-booster-didact/main/modify-hello.didact.md'
   - id: redhat/java/latest
     preferences:
       java.server.launchMode: Standard
